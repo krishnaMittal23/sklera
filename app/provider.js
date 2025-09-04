@@ -8,16 +8,16 @@ const Provider = ({ children }) => {
   const { user } = useUser();
 
   useEffect(() => {
-    user && checkIsNewUser();
+    if (user) {
+      checkIsNewUser();
+    }
   }, [user]);
 
   const checkIsNewUser = async () => {
     try {
+      // Send full Clerk user object
       const resp = await axios.post("/api/create-user", {
-        user: {
-          name: user?.fullName,
-          email: user?.primaryEmailAddress?.emailAddress,
-        },
+        user: user,
       });
       console.log("User created/exists:", resp.data);
     } catch (err) {

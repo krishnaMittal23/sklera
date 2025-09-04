@@ -7,11 +7,17 @@ import TopicInput from "./_components/TopicInput";
 import axios from "axios";
 import { v4 as uuid4 } from "uuid";
 import { useUser } from "@clerk/nextjs";
+import { Loader } from "lucide-react";
+import {useRouter} from 'next/navigation'
+import { toast } from "sonner"
 
 const Create = () => {
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({});
+  const [loading,setLoading] = useState(false)
   const { user } = useUser();
+
+  const router = useRouter();
 
   const handleUserInput = (fieldName, fieldValue) => {
     setFormData((prev) => ({
@@ -24,11 +30,18 @@ const Create = () => {
   const GenerateCourseOutline = async () => {
     try {
       const courseId = uuid4();
+      setLoading(true)
       const result = await axios.post("/api/generate-course-outline", {
         courseId: courseId,
         ...formData,
         createdBy: user?.primaryEmailAddress?.emailAddress,
       });
+
+      setLoading(false);
+      router.replace('/dashboard')
+      // toast notification
+      toast("Your course content is generating, Refresh to see")
+
 
       console.log("API Response:", result.data);
     } catch (err) {
@@ -72,7 +85,7 @@ const Create = () => {
         {step === 0 ? (
           <Button onClick={() => setStep(step + 1)}>Next</Button>
         ) : (
-          <Button onClick={GenerateCourseOutline}>Generate</Button>
+          <Button onClick={GenerateCourseOutline} disabled={loading}>{loading? <Loader className="animate-spin"/> : 'Generate'}</Button>
         )}
       </div>
     </div>

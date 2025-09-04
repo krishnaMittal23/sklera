@@ -8,3 +8,5 @@
 
 
  - add functions to route.js in inngest
+
+ npx inngest-cli@latest dev
